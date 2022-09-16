@@ -1,0 +1,19 @@
+
+include = {
+   "cccomplete",
+   "cccomplete%/.+$",
+   "selection",
+   "selection%/.+$",
+   "tools",
+   "tools%/.+$",
+}
+
+exclude = {
+  "debugger$",
+  "spec%/.+$",
+  "[.]luarocks/",
+  "/usr/local/share",
+  "myio.lua",
+  ".asdf/"
+}
+

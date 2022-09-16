@@ -6,12 +6,13 @@ local t = require'l42.tools'
 
 local function compile_destination(window)
   if string.match(window, "^[-+]") then
-    return " -t :" .. window .. " "
+    return " -t :" .. window
   end
-  return " -t :=" .. window .. " "
+  return " -t :=" .. window
 end
 
 local function switch_to(destination)
+  api.nvim_command("write!")
   local destination = compile_destination(destination)
 
   local command = 'tmux select-window' .. destination
@@ -23,6 +24,14 @@ local function again(window)
   api.nvim_command("write!")
   local destination = compile_destination(window)
   local command = "tmux send-keys" .. destination .. 'Up C-m'
+end
+
+function mv_to_alternate_window()
+  local alt_window = t.get_var('l42_tmux_alternate_window')
+
+  if alt_window then
+    switch_to(alt_window)
+  end
 end
 
 local function mv_to_window_left()
@@ -39,6 +48,7 @@ local function version()
 end
 
 return {
+  mv_to_alternate_window = mv_to_alternate_window,
   mv_to_window_left = mv_to_window_left,
   mv_to_window_right = mv_to_window_right,
   version = version
