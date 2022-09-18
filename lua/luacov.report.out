@@ -84,6 +84,7 @@ l42/tmux.lua
 ==============================================================================
 l42/tools.lua
 ==============================================================================
+<<<<<<< HEAD
      -- local dbg = require("debugger")
      -- dbg.auto_where = 2
 
@@ -137,10 +138,66 @@ l42/tools.lua
   19   init_var = init_var,
   19   p = p
   19 }
+=======
+    -- local dbg = require("debugger")
+    -- dbg.auto_where = 2
+
+ 10 local api = vim.api
+
+    local function p(value)
+**0   echo(vim.inspect(value), true)
+    end
+
+    local function create_cmd(cmd_name, cmd_value, cmd_options, mapping)
+**0   local cmd_options = cmd_options or {}
+**0   api.nvim_create_user_command(cmd_name, cmd_value, cmd_options)
+
+**0   if mapping then
+**0     api.nvim_command('map ' .. mapping .. ' :' .. cmd_name .. '<CR>')
+      end
+    end
+
+    local function echo(message, history, options)
+**0   local history = history or false
+**0   local options = options or {}
+**0   api.nvim_echo({{message}}, history, options)
+    end
+
+    -- Exception Handling à la Lua
+    local function get_var(name)
+      local getter = function()
+  3     local val = vim.api.nvim_get_var(name)
+  3     return val
+      end
+  3   local ok, val = pcall(getter)
+  3   if ok then
+  3     return val
+      end
+    end
+
+    local function init_var(name, value)
+**0   local old_value = get_var(name)
+**0   if old_value then
+**0     return old_value
+      end
+
+**0   api.nvim_set_var(name, value)
+**0   return value
+    end
+
+ 10 return {
+ 10   create_command = create_cmd,
+ 10   echo = echo,
+ 10   get_var = get_var,
+ 10   init_var = init_var,
+ 10   p = p
+ 10 }
+>>>>>>> c055ea0 (added luacov to .gitignore)
 
 ==============================================================================
 l42/tools/fn.lua
 ==============================================================================
+<<<<<<< HEAD
      -- local dbg = require("debugger")
      -- dbg.auto_where = 2
   20 local append = require"l42.tools.list".append
@@ -300,10 +357,172 @@ l42/tools/fn.lua
   20   range     = range,
   20   reduce    = reduce
   20 }
+=======
+    -- local dbg = require("debugger")
+    -- dbg.auto_where = 2
+ 10 local append = require"l42.tools.list".append
+
+ 10 local function id(x) return x end
+
+ 10 local free = {}
+    local function combine_params(dtp, ctp)
+**0   local t = {}
+**0   for _, value in ipairs(dtp) do
+**0     if value == free then
+**0       table.insert(t, table.remove(ctp, 1))
+        else
+**0       table.insert(t, value)
+        end
+      end
+**0   return append(t, ctp)
+    end
+
+    local function merge_onto(target, src)
+**0   for k, v in pairs(src) do
+**0     target[k] = v
+      end
+    end
+
+    local function merge(...)
+**0   local result = {}
+**0   local tables = {...}
+**0   for _, table in ipairs(tables) do
+**0     merge_onto(result, table)
+      end
+**0   return result
+    end
+
+    local function curry(fn, ...)
+  4   local def_time_params = {...}
+      return function(...)
+ 32     local call_time_params = {...}
+ 32     local total_params = append(def_time_params, call_time_params)
+ 32     return fn(table.unpack(total_params))
+      end
+    end
+
+    local function curry_at(fn, ...)
+**0   local def_time_params = {...}
+      return function(...)
+**0     local call_time_params = {...}
+**0     local total_params = combine_params(def_time_params, call_time_params)
+**0     return fn(table.unpack(total_params))
+      end
+    end
+
+    local function curry_kwd(fn, ctkwds)
+**0   local ctkwds = ctkwds
+      return function(rtkwds)
+**0     local total_kwds=merge(ctkwds, rtkwds)
+**0     return fn(total_kwds)
+      end
+    end
+
+    local function _access(container, idx)
+ 32   if type(container) == "string" then
+**0     return string.sub(container, idx, idx)
+      else
+ 32     return container[idx]
+      end
+    end
+
+    local function foldl(list, fn, initial)
+  4   local init_idx = 1
+  4   local acc = initial
+  4   if not acc then
+**0     if #list == 0 then error("must not fold an empty list without an initial value") end
+**0     init_idx = 2
+**0     acc = list[1]
+      end
+  4   local size = #list
+ 36   for idx = init_idx, size do
+ 32     acc = fn(acc, _access(list, idx))
+      end
+  4   return acc
+    end
+
+    -- OMG for side effects
+    local function each(list, fn)
+**0   foldl(list, function(_, ele) fn(ele) end, true)
+    end
+
+    local function find(table, fn)
+**0   for pattern, value in pairs(table) do
+**0     if fn(pattern) then return value end
+      end
+**0   return nil
+    end
+
+    local function find_match(table, matchee)
+**0   return find(table, function(pattern)
+**0     return string.match(matchee, pattern)
+      end)
+    end
+
+    local function _recursive_insert(list, values)
+**0   if type(values) == "table" then
+**0     for _, value in ipairs(values) do
+**0       _recursive_insert(list, value)
+        end
+      else
+**0     table.insert(list, values)
+      end
+    end
+    local function flat_map(list, fn)
+**0   local fn = fn or id
+      local append = function(list, ele)
+**0     _recursive_insert(list, fn(ele))
+**0     return list
+      end
+**0   return foldl(list, append, {})
+    end
+
+    local function map(list, fn)
+  4   local fn = fn or id
+      local append = function(list, ele)
+ 32     table.insert(list, fn(ele))
+ 32     return list
+      end
+  4   return foldl(list, append, {})
+    end
+    local function range(low, high, step)
+  4   local step = step or 1
+  4   local result = {}
+ 36   for i = low, high, step do
+ 32     table.insert(result, i)
+      end
+  4   return result
+    end
+
+    local function reduce(table, initial, fn)
+**0   for _, value in ipairs(table) do
+**0     initial = fn(initial, value)
+      end
+**0   return initial
+    end
+
+ 10 return {
+ 10   curry     = curry,
+ 10   curry_at  = curry_at,
+ 10   curry_kwd = curry_kwd,
+ 10   each      = each,
+ 10   find      = find,
+ 10   find_match = find_match,
+ 10   flat_map  = flat_map,
+ 10   foldl     = foldl,
+ 10   free      = free,
+ 10   id        = id,
+ 10   map       = map,
+ 10   merge     = merge,
+ 10   range     = range,
+ 10   reduce    = reduce
+ 10 }
+>>>>>>> c055ea0 (added luacov to .gitignore)
 
 ==============================================================================
 l42/tools/list.lua
 ==============================================================================
+<<<<<<< HEAD
      -- local dbg = require("debugger")
      -- dbg.auto_where = 2
   20 local range = require'l42.tools.range'
@@ -481,10 +700,190 @@ l42/tools/list.lua
   20   slice  = slice,
   20   tail_from  = tail_from,
   20 }
+=======
+    -- local dbg = require("debugger")
+    -- dbg.auto_where = 2
+ 10 local range = require'l42.tools.range'
+    local slice
+
+    local function append(list1, list2, fn)
+ 32   local result = {}
+ 32   if fn then
+**0     for _, val in ipairs(list1) do
+**0       table.insert(result, fn(val))
+        end
+**0     for _, val in ipairs(list2) do
+**0       table.insert(result, fn(val))
+        end
+      else
+ 64     for _, val in ipairs(list1) do
+ 32       table.insert(result, val)
+        end
+ 64     for _, val in ipairs(list2) do
+ 32       table.insert(result, val)
+        end
+      end
+ 32   return result
+    end
+
+    local function concat(...)
+**0   local result = {}
+**0   for _, table in ipairs({...}) do
+**0     result = append(result, table)
+      end
+**0   return result
+    end
+
+    local function listmod(n, s)
+**0   local r = n % s
+**0   if r == 0 then
+**0     return s
+      else
+**0     return r
+      end
+    end
+
+    local function partition(list, spos, epos)
+**0   local lhs = slice(list, 1, spos - 1)
+**0   local mhs = slice(list, spos, epos)
+**0   local rhs = slice(list, math.max(epos, spos - 1) + 1)
+
+**0   return lhs, mhs, rhs
+    end
+
+    local function push(list, element, fn)
+**0   local result = {}
+      -- if fn then
+      --   for _, val in ipairs(list1) do
+      --     table.insert(result, fn(val))
+      --   end
+      --   table.insert(result, fn(element))
+      -- else
+**0     for _, val in ipairs(list) do
+**0       table.insert(result, val)
+        end
+**0     table.insert(result, element)
+      -- end
+**0   return result
+    end
+
+    local function readonly(t, msg)
+**0   local proxy = {}
+**0   local mt = {
+      __index = t,
+      __newindex = function (t,k,v)
+**0     error(msg or "attempt to update a read-only table", 2)
+      end
+      }
+**0   setmetatable(proxy, mt)
+**0   return proxy
+    end
+
+    local function _flatten(acc, list)
+**0   for _, ele in ipairs(list) do
+**0     if type(ele) == 'table' then
+**0       _flatten(acc, ele)
+        else
+**0       table.insert(acc, ele)
+        end
+      end
+**0   return acc
+    end
+
+    local function flatten(...)
+**0   local list = {...}
+**0   return _flatten({}, list)
+    end
+    slice = function(list, startpos, endpos, fn)
+**0   local endpos = endpos or #list
+**0   if endpos < 0 then
+**0     endpos = #list + 1 + endpos
+      end
+**0   if startpos < 0 then
+**0     startpos = #list + 1 + startpos
+      end
+**0   local rng = range(startpos, endpos):intersect(startpos, #list)
+**0   local result = {}
+**0   if fn then
+**0     for idx in rng:iter() do
+**0       table.insert(result, fn(list[idx]))
+        end
+      else
+**0     for idx in rng:iter() do
+**0       table.insert(result, list[idx])
+        end
+      end
+**0   return result
+    end
+
+    local function rotate_left(list, by)
+**0   local by = by or 1
+**0   local t = {}
+**0   local s = #list
+**0   for idx, value in ipairs(list) do
+**0     t[listmod(idx - by, s)] = value
+      end
+**0   return t
+    end
+
+    local function rotate_right(list, by)
+**0   local by = by or 1
+**0   local t = {}
+**0   local s = #list
+**0   for idx, value in ipairs(list) do
+**0     t[listmod(idx + by, s)] = value
+      end
+**0   return t
+    end
+
+    local function replace(source, idx1, idx2, with)
+**0   local lhs, middle, rhs = partition(source, idx1, idx2)
+**0   local result = concat(lhs, with, rhs)
+**0   return result
+    end
+
+    local function reverse(list)
+**0   local result = {}
+**0   for _, val in ipairs(list) do
+**0     table.insert(result, 1, val)
+      end
+**0   return result
+    end
+
+    local function tail_from(list, fun, include)
+**0   local include = include or false
+**0   local result = {}
+**0   for i = #list, 1, -1 do
+**0     if fun(list[i]) then
+**0       if include then
+**0         table.insert(result, 1, list[i])
+          end
+**0       return result
+        end
+**0     table.insert(result, 1, list[i])
+      end
+**0   return result
+    end
+ 10 return {
+ 10   append = append,
+ 10   concat = concat,
+ 10   flatten = flatten,
+ 10   partition = partition,
+ 10   push = push,
+ 10   readonly = readonly,
+ 10   replace = replace,
+ 10   reverse = reverse,
+ 10   rotate_left = rotate_left,
+ 10   rotate_right = rotate_right,
+ 10   slice  = slice,
+ 10   tail_from  = tail_from,
+ 10 }
+>>>>>>> c055ea0 (added luacov to .gitignore)
 
 ==============================================================================
 l42/tools/range.lua
 ==============================================================================
+<<<<<<< HEAD
      -- local dbg = require("debugger")
      -- dbg.auto_where = 2
 
@@ -553,10 +952,81 @@ l42/tools/range.lua
        }
      end
   20 return new
+=======
+    -- local dbg = require("debugger")
+    -- dbg.auto_where = 2
+
+    local new
+
+    local function _make_range(from, to)
+**0   local t = {}
+**0   for i = from, to do
+**0     table.insert(t, i)
+      end
+**0   return t
+    end
+
+    local function _extract_limits(low_or_range, high_or_nil)
+**0   if type(low_or_range) == "table" then
+**0     return low_or_range.low, low_or_range.high
+      else
+**0     return low_or_range, (high_or_nil or low_or_range)
+      end
+    end
+
+    local function _extend(self, lorrg, hornil)
+**0   local low, high = _extract_limits(lorrg, hornil)
+**0   local new_low = math.min(low, self.low)
+**0   local new_high = math.max(high, self.high)
+**0   return new(new_low, new_high)
+    end
+
+    local function _intersect(self, lorrg, hornil)
+**0   local low, high = _extract_limits(lorrg, hornil)
+**0   local new_low = math.max(low, self.low)
+**0   local new_high = math.min(high, self.high)
+**0   return new(new_low, new_high)
+    end
+
+    local function _iter(self)
+**0   local count = self.low
+**0   local high  = self.high
+      return function()
+**0     if count <= high then
+**0       count = count + 1
+**0       return count - 1
+        end
+      end
+    end
+
+    local function _to_list(self)
+      -- dbg()
+**0   if self._list then return self._list end 
+**0   self._list = _make_range(self.low, self.high)
+**0   return self._list
+    end
+
+    new = function(low, high)
+**0   local high = high or low
+**0   return {
+        -- data
+        low = low,
+        high = high,
+        _list = nil,
+        -- methods
+        extend = _extend,
+        intersect = _intersect,
+        iter = _iter,
+        to_list = _to_list,
+      }
+    end
+ 10 return new
+>>>>>>> c055ea0 (added luacov to .gitignore)
 
 ==============================================================================
 l42/tools/string.lua
 ==============================================================================
+<<<<<<< HEAD
      -- local dbg = require("debugger")
      -- dbg.auto_where = 2
   20 local map = require 'l42.tools.fn'.map
@@ -689,6 +1159,140 @@ l42/tools/string.lua
   20   split_at_col = split_at_col,
   20   strip = strip
   20 }
+=======
+    -- local dbg = require("debugger")
+    -- dbg.auto_where = 2
+ 10 local map = require 'l42.tools.fn'.map
+ 10 local find_match = require 'l42.tools.fn'.find_match
+    local _replacer
+
+    local function chunk(str, spos, epos)
+**0   local str   = str
+**0   local startpos = spos or 1
+**0   local endpos   = epos or #str
+**0   return {
+        chunk  = function() return string.sub(str, startpos, endpos) end,
+        delete = function() return _replacer(str, startpos, endpos)("") end,
+        endpos = function() return endpos end,
+        prefix = function() return string.sub(str, 1, startpos - 1) end,
+        replace = _replacer(str, startpos, endpos),
+        startpos = function() return startpos end,
+        string = function() return str end,
+        suffix = function() return string.sub(str, endpos + 1, -1) end,
+**0     to_s   = function(self) return {
+**0       str = str, spos = startpos, epos = endpos, chunk = self.chunk() 
+**0     } end
+      }
+    end
+
+    _replacer = function(str, startpos, endpos)
+      return function(new)
+**0     local prefix = string.sub(str, 1, startpos - 1)
+**0     local suffix = string.sub(str, endpos + 1, -1) 
+**0     local newstr = prefix .. new .. suffix
+**0     return chunk(newstr, startpos, startpos + #new - 1)
+      end
+    end
+
+    local function match_at(str, pos, pattern)
+**0   local pattern = pattern or "[%w_]+"
+**0   local str     = str
+**0   local pos     = pos
+**0   local spos    = pos
+**0   local epos    = pos - 1
+      -- dbg()
+      -- N.B. pfx and sfx overlap by one grapheme therefor the either both match or match not
+**0   local pfx     = string.sub(str, 1, pos)
+**0   local sfx     = string.sub(str, pos, -1)
+**0   local pm      = string.match(pfx, pattern .. "$")
+**0   local sm      = string.match(sfx, "^" .. pattern)
+**0   if pm then
+**0     return chunk(str, spos + 1 - #pm, epos + #sm)
+      else
+**0     return chunk(str, pos, pos - 1)
+      end 
+    end
+
+    local function split(inputstr, sep)
+**0   if sep == "" then
+**0     return map(inputstr)
+      end
+**0   if sep == nil then
+**0     sep = "%s"
+      end
+**0   local t={}
+**0   for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+**0     table.insert(t, str)
+      end
+**0   return t
+    end
+
+
+ 10 local matching_pairs = {
+ 10   ["%w"] = "%W",
+ 10   ["%s"] = "%S"
+    }
+
+    local function find_matched(str, start, incr, pattern)
+**0   local idx = start
+**0   local len = #str
+**0   while idx > 0 and idx <= len do
+**0     if string.match(string.sub(str, idx, idx), pattern) then return idx end
+**0     idx = idx + incr
+      end
+      -- print("idx "..idx)
+**0   return idx
+    end
+
+    local function fst(input, size)
+**0   local size = size or 1
+**0   return string.sub(input, 1, size)
+    end
+
+    local function rst(input, from)
+**0   local from = from or 1
+**0   return string.sub(input, from + 1, string.len(input))
+    end
+
+    local function fst_and_rst(input, at)
+**0   local at = at or 1
+**0   return {fst(input, at), rst(input, at)}
+    end
+
+    local function rtrim(str, with)
+**0   local with = with or "%s"
+**0   local pattern = with .. "*$"
+**0   return string.gsub(str, pattern, "")
+    end
+
+    local function split_at_col(line, col)
+**0   local col = col + 1
+**0   local char = string.sub(line, col, col)
+**0   local matched = find_match(matching_pairs, char)
+**0   if not matched then return "", line, "" end
+**0   local lpos = find_matched(line, col-1, -1, matched)
+**0   local rpos = find_matched(line, col+1, 1, matched)
+      -- print("lpos"..lpos)
+      -- print("rpos"..rpos)
+**0   return string.sub(line, 1, lpos),
+**0     string.sub(line, lpos+1, rpos-1),
+**0     string.sub(line, rpos, #line)
+    end
+
+    local function strip(str)
+**0   return string.gsub(string.gsub(str, "^%s*", ""), "%s*$", "")
+    end
+
+ 10 return {
+ 10   chunk = chunk,
+ 10   match_at = match_at,
+ 10   fst_and_rst = fst_and_rst,
+ 10   rtrim = rtrim,
+ 10   split = split,
+ 10   split_at_col = split_at_col,
+ 10   strip = strip
+ 10 }
+>>>>>>> c055ea0 (added luacov to .gitignore)
 
 ==============================================================================
 Summary
@@ -696,11 +1300,19 @@ Summary
 
 File                 Hits Missed Coverage
 -----------------------------------------
+<<<<<<< HEAD
 l42/tmux.lua         36   2      94.74%
 l42/tools.lua        22   4      84.62%
+=======
+l42/tools.lua        13   13     50.00%
+>>>>>>> c055ea0 (added luacov to .gitignore)
 l42/tools/fn.lua     41   41     50.00%
 l42/tools/list.lua   22   74     22.92%
 l42/tools/range.lua  1    25     3.85%
 l42/tools/string.lua 14   56     20.00%
 -----------------------------------------
+<<<<<<< HEAD
 Total                136  202    40.24%
+=======
+Total                91   209    30.33%
+>>>>>>> c055ea0 (added luacov to .gitignore)
