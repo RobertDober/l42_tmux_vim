@@ -1,5 +1,5 @@
--- local dbg = require("debugger")
--- dbg.auto_where = 2
+local dbg = require("debugger")
+dbg.auto_where = 2
 
 local api = vim.api
 
@@ -12,6 +12,7 @@ local function create_cmd(cmd_name, cmd_value, cmd_options, mapping)
   api.nvim_create_user_command(cmd_name, cmd_value, cmd_options)
 
   if mapping then
+    dbg()
     api.nvim_command('map ' .. mapping .. ' :' .. cmd_name .. '<CR>')
   end
 end
@@ -22,15 +23,16 @@ local function echo(message, history, options)
   api.nvim_echo({{message}}, history, options)
 end
 
--- Exception Handling à la Lua
-local function get_var(name)
+local function get_var(name, default)
   local getter = function()
-    local val = vim.api.nvim_get_var(name)
-    return val
+    return vim.api.nvim_get_var(name)
   end
+  -- Exception Handling à la Lua
   local ok, val = pcall(getter)
   if ok then
     return val
+  else
+    return default
   end
 end
 

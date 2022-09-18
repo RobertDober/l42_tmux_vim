@@ -1,11 +1,7 @@
 
 include = {
-   "cccomplete",
-   "cccomplete%/.+$",
-   "selection",
-   "selection%/.+$",
-   "tools",
-   "tools%/.+$",
+   "l42%/",
+   "init.+"
 }
 
 exclude = {

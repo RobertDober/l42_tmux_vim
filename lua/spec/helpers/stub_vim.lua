@@ -25,6 +25,9 @@ local _evaluations = {
 local _marks = {
 }
 
+local _user_commands = {
+}
+
 local _variables = {
 }
 
@@ -35,6 +38,9 @@ local _vim = {
     end,
     nvim_command = function(cmd)
       table.insert(_commands, cmd)
+    end,
+    nvim_create_user_command = function(name, value, options)
+      table.insert(_user_commands, {name, value, options})
     end,
     nvim_get_current_line = function()
       return _buffer.lines[_buffer.cursor[1]]
@@ -73,7 +79,10 @@ local _vim = {
 
     -- for inspection in tests
     _called = function() return _called end,
+    _commands = function() return _commands end,
+    _user_commands = function() return _user_commands end,
     _executed_commands = function() return _commands end,
+    _variables = function() return _variables end,
   },
   inspect = tostring,
   __stubbed__ = true,
