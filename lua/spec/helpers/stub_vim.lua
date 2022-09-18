@@ -65,7 +65,11 @@ local _vim = {
       return _evaluations[cmd]
     end,
     nvim_get_var = function(name)
-      return _variables[name]
+      value = _variables[name]
+      if value then
+        return value
+      end
+      error("not found")
     end,
     nvim_set_var = function(name, value)
       _variables[name] = value
@@ -77,6 +81,19 @@ local _vim = {
       _buffer.lines = lst.replace(_buffer.lines, lnb1 + 1, lnb2, lines)
     end,
 
+    reset_output = function()
+      _called = {}
+      _called = {}
+      _commands = {}
+      _options = {}
+      _evaluations = {}
+      _marks = {}
+      _user_commands = {}
+    end,
+
+    reset_input = function()
+      _variables= {}
+    end,
     -- for inspection in tests
     _called = function() return _called end,
     _commands = function() return _commands end,
@@ -162,6 +179,7 @@ local function _stub_vim(params)
 end
 
 return {
+  api = _vim.api,
   stub_vim = _stub_vim,
   stubber = stubber_api,
 }

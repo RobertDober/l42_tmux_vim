@@ -1,5 +1,5 @@
-local dbg = require("debugger")
-dbg.auto_where = 2
+-- local dbg = require("debugger")
+-- dbg.auto_where = 2
 
 local random_string = require'spec.helpers.random'.random_string
 local stub = require'spec.helpers.stub_vim'
@@ -15,13 +15,13 @@ local right_again = ',rightagain'
 stub.stubber.var("l42_tmux_mv_to_alternate_window", alt)
 stub.stubber.var("l42_tmux_mv_to_window_left", left)
 stub.stubber.var("l42_tmux_mv_to_window_right", right)
-stub.stubber.var("l42_tmux_mv_to_alterate_window_and_again", alt_again)
-stub.stubber.var("l42_tmux_mv_to_window_left_and_again", left_again)
-stub.stubber.var("l42_tmux_mv_to_window_right_and_again", right_again)
+stub.stubber.var("l42_tmux_mv_to_alternate_window_again", alt_again)
+stub.stubber.var("l42_tmux_mv_to_window_left_again", left_again)
+stub.stubber.var("l42_tmux_mv_to_window_right_again", right_again)
 require 'init'
 
 describe("custom mappings", function()
-  it("Move to alternate window", function()
+  it("Move to alternate window #wip", function()
     assert.are.same('map '..alt..' :L42MvToAlternateWindow<CR>', vim.api._commands()[1])
   end)
   it("Move to left window", function()

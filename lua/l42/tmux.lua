@@ -64,7 +64,7 @@ local function mv_to_window_right_and_again()
 end
 
 local function version()
-  local current_version = api.nvim_get_var('l42_tmux_vim_version')
+  local current_version = t.get_var('l42_tmux_vim_version', 'unknown')
   t.echo("l42_tmux_vim v" .. current_version)
 end
 
