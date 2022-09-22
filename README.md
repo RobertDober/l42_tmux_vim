@@ -148,8 +148,7 @@ local ctxt = require'l42.context'
 local function my_cmd()
   local ctxt = ctxt() -- evaluate context only now when invoking the command
   local rspec_window = ctxt.api.get_var('l42_tmux_ruby_test_window')
-  cc(ctxt,
-    {
+  cc{
       -- if in an rspec file and a context line
       {
         cmd = ctxt.api.get_var('l42_tmux_ruby_test_command'), -- reads g:l42_tmux_ruby_test_command
@@ -176,6 +175,6 @@ local function my_cmd()
         cmd = ':w!',
         dest = '+1',
         select = false
-    })
+    }
 end
 ```

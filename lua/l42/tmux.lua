@@ -38,7 +38,7 @@ local function switch_to(destination, do_not_write)
 end
 
 function mv_to_alternate_window()
-  local alt_window = t.get_var('l42_tmux_alternate_window')
+  local alt_window = t.get_var_or('l42_tmux_alternate_window')
 
   if alt_window then
     switch_to(alt_window)

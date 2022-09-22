@@ -34,14 +34,36 @@ local function get_var(name, default, and_set)
   end
 end
 
+local function get_var_or(name, handler)
+  local ok, val = pcall(function() return api.nvim_get_var(name) end)
+  if ok then
+    return val
+  else
+    if type(handler) == 'function' then
+      return handler(name)
+    elseif type(handler) == 'string' then
+      error("attempt to read undefined variable: g:" .. name .. "; " .. string)
+    else
+      error("attempt to read undefined variable: g:" .. name)
+    end
+  end
+end
+
+
 local function init_var(name, value)
   return get_var(name, value, true)
+end
+
+local function system_cmd(cmd)
+  api.nvim_call_function('system', {cmd})
 end
 
 return {
   create_command = create_cmd,
   echo = echo,
   get_var = get_var,
+  get_var_or = get_var_or,
   init_var = init_var,
-  p = p
+  p = p,
+  system_cmd = system_cmd,
 }

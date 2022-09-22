@@ -12,42 +12,23 @@ local _buffer = {
 
 local _called = {
 }
-
 local _commands = {
-
+}
+local _echoed = {
+}
+local _evaluations = {
+}
+local _marks = {
 }
 local _options = {
 }
-
-local _evaluations = {
-}
-
-local _marks = {
-}
-
 local _user_commands = {
 }
-
 local _variables = {
 }
 
 local _vim = {
   api = {
-    nvim_call_function = function(fname, params)
-      table.insert(_called, {fname, params})
-    end,
-    nvim_command = function(cmd)
-      table.insert(_commands, cmd)
-    end,
-    nvim_create_user_command = function(name, value, options)
-      table.insert(_user_commands, {name, value, options})
-    end,
-    nvim_get_current_line = function()
-      return _buffer.lines[_buffer.cursor[1]]
-    end,
-    nvim_win_get_cursor = function(_)
-      return _buffer.cursor
-    end,
     nvim_buf_get_lines = function(_, lnb1, lnb2, _)
       local lnb2 = lnb2
       if lnb2 < 0 then
@@ -58,11 +39,29 @@ local _vim = {
     nvim_buf_get_mark = function(_, mark)
       return _marks[mark] or {0, 0}
     end,
-    nvim_buf_get_option = function(_, name)
-      return _options[name]
+    nvim_buf_set_lines = function(_, lnb1, lnb2, _, lines)
+      _buffer.lines = lst.replace(_buffer.lines, lnb1 + 1, lnb2, lines)
+    end,
+    nvim_call_function = function(fname, params)
+      table.insert(_called, {fname, params})
+    end,
+    nvim_command = function(cmd)
+      table.insert(_commands, cmd)
+    end,
+    nvim_create_user_command = function(name, value, options)
+      table.insert(_user_commands, {name, value, options})
+    end,
+    nvim_echo = function(message)
+      table.insert(_echoed, message[1][1])
     end,
     nvim_eval = function(cmd)
       return _evaluations[cmd]
+    end,
+    nvim_get_current_line = function()
+      return _buffer.lines[_buffer.cursor[1]]
+    end,
+    nvim_get_option = function(name)
+      return _options[name]
     end,
     nvim_get_var = function(name)
       value = _variables[name]
@@ -74,11 +73,11 @@ local _vim = {
     nvim_set_var = function(name, value)
       _variables[name] = value
     end,
+    nvim_win_get_cursor = function(_)
+      return _buffer.cursor
+    end,
     nvim_win_set_cursor = function(_, cursor)
       _buffer.cursor = cursor
-    end,
-    nvim_buf_set_lines = function(_, lnb1, lnb2, _, lines)
-      _buffer.lines = lst.replace(_buffer.lines, lnb1 + 1, lnb2, lines)
     end,
 
     reset_output = function()
@@ -86,6 +85,7 @@ local _vim = {
       _called = {}
       _commands = {}
       _options = {}
+      _echoed = {}
       _evaluations = {}
       _marks = {}
       _user_commands = {}
@@ -97,8 +97,10 @@ local _vim = {
     -- for inspection in tests
     _called = function() return _called end,
     _commands = function() return _commands end,
-    _user_commands = function() return _user_commands end,
+    _echoed = function() return _echoed end,
     _executed_commands = function() return _commands end,
+    _options = function() return _options end,
+    _user_commands = function() return _user_commands end,
     _variables = function() return _variables end,
   },
   inspect = tostring,
