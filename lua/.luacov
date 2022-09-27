@@ -7,7 +7,6 @@ include = {
 exclude = {
   "debugger$",
   "spec%/.+$",
-  "l42%/tools%/",
   "[.]luarocks/",
   "/usr/local/share",
   "myio.lua",

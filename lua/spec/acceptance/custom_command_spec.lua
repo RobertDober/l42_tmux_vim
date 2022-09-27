@@ -7,7 +7,7 @@ local stubber = stub.stubber
 
 local cc = require'l42.tmux.custom_command'
 local alt_window = require'spec.helpers.random'.random_string("alt win")
-local dest = ' -t :=' .. alt_window .. ' '
+local dest = ' -t :=' .. alt_window
 
 describe("MVP", function()
   before_each(function()
@@ -23,7 +23,7 @@ describe("MVP", function()
     cc{
       cmd = "hello world"
     }
-    assert.are.same({"system", {"tmux send-keys" .. dest .. "'hello world' C-m"}}, vim.api._called()[1])
+    assert.are.same({"system", {"tmux send-keys" .. dest .. " 'hello world' C-m"}}, vim.api._called()[1])
     assert.are.same({"system", {"tmux select-window" .. dest}}, vim.api._called()[2])
   end)
 
@@ -35,7 +35,7 @@ describe("MVP", function()
         match = "^%s*#%s",
         select = false,
       }
-      assert.are.same({"system", {"tmux send-keys" .. dest .. "'on comment' C-m"}}, vim.api._called()[1])
+      assert.are.same({"system", {"tmux send-keys" .. dest .. " 'on comment' C-m"}}, vim.api._called()[1])
       assert.is_nil(vim.api._called()[2])
     end)
     it('does not match a comment', function()
@@ -55,7 +55,7 @@ describe("MVP", function()
         cmd = "this is elixir",
         ft  = "elixir",
       }
-      assert.are.same({"system", {"tmux send-keys" .. dest .. "'this is elixir' C-m"}}, vim.api._called()[1])
+      assert.are.same({"system", {"tmux send-keys" .. dest .. " 'this is elixir' C-m"}}, vim.api._called()[1])
       assert.are.same({"system", {"tmux select-window" .. dest}}, vim.api._called()[2])
     end)
     it('does not match the filetype', function()
@@ -75,7 +75,7 @@ describe("MVP", function()
         path_match = '^dir.*%.ext$',
         params = 'world'
       }
-      assert.are.same({"system", {"tmux send-keys" .. dest .. "'echo world' C-m"}}, vim.api._called()[1])
+      assert.are.same({"system", {"tmux send-keys" .. dest .. " 'echo world' C-m"}}, vim.api._called()[1])
       assert.are.same({"system", {"tmux select-window" .. dest}}, vim.api._called()[2])
     end)
     it('does not match the path #wip', function()
@@ -100,7 +100,7 @@ describe("MVP", function()
           ft  = 'ruby'
         }
       }
-      assert.are.same({"system", {"tmux send-keys" .. dest .. "'first' C-m"}}, vim.api._called()[1])
+      assert.are.same({"system", {"tmux send-keys" .. dest .. " 'first' C-m"}}, vim.api._called()[1])
       assert.are.same({"system", {"tmux select-window" .. dest}}, vim.api._called()[2])
       assert.is_nil(vim.api._called()[3])
     end)
@@ -115,7 +115,7 @@ describe("MVP", function()
           ft  = 'elixir'
         }
       }
-      assert.are.same({"system", {"tmux send-keys" .. dest .. "'second' C-m"}}, vim.api._called()[1])
+      assert.are.same({"system", {"tmux send-keys" .. dest .. " 'second' C-m"}}, vim.api._called()[1])
       assert.are.same({"system", {"tmux select-window" .. dest}}, vim.api._called()[2])
       assert.is_nil(vim.api._called()[3])
     end)

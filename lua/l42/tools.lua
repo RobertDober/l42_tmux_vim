@@ -4,7 +4,7 @@
 local api = vim.api
 
 local function p(value)
-  echo(vim.inspect(value), true)
+  print(vim.inspect(value))
 end
 
 local function create_cmd(cmd_name, cmd_value, cmd_options, mapping)
@@ -59,7 +59,7 @@ local function system_cmd(cmd)
 end
 
 return {
-  create_command = create_cmd,
+  create_cmd = create_cmd,
   echo = echo,
   get_var = get_var,
   get_var_or = get_var_or,

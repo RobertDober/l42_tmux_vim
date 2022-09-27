@@ -1,24 +1,27 @@
 -- local dbg = require("debugger")
 -- dbg.auto_where = 2
 
-
 local api = vim.api
 local t = require 'l42.tools'
 
 -- Forward Declarations
 local tmux_cmd
 
-local function compile_dest(dest, lazy)
+local function compile_dest(dest, lazy, no_ws_at_end)
+  local suffix = no_ws_at_end and '' or ' '
   if lazy then
-    return ' -t ' .. dest .. ' '
+    return ' -t ' .. dest .. suffix
   else
-    return ' -t :=' .. dest .. ' '
+    if string.match(dest, '^[-+]') then
+      return ' -t :' .. dest .. suffix
+    end
+    return ' -t :=' .. dest .. suffix
   end
 end
 
 local function select_window(dest)
   local dest = dest or t.get_var_or('l42_tmux_alternate_window')
-  tmux_cmd('select-window', dest)
+  t.system_cmd('tmux select-window' .. compile_dest(dest, false, true))
 end
 
 local function send_keys(keys, dest, no_return)

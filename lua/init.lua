@@ -18,13 +18,13 @@ t.init_var('l42_tmux_ruby_test_command', 'bundle exec rspec')
 t.init_var('l42_tmux_ruby_test_window', 'tests')
 
 
-t.create_command('L42MvToAlternateWindow', tmux.mv_to_alternate_window, {}, ta)
-t.create_command('L42MvToWindowLeft', tmux.mv_to_window_left, {}, tl )
-t.create_command('L42MvToWindowRight', tmux.mv_to_window_right, {}, tr)
-t.create_command('L42MvToAlternateWindowAndAgain', tmux.mv_to_alternate_window_and_again, {}, taa)
-t.create_command('L42MvToWindowLeftAndAgain', tmux.mv_to_window_left_and_again, {}, tla )
-t.create_command('L42MvToWindowRightAndAgain', tmux.mv_to_window_right_and_again, {}, tra)
+t.create_cmd('L42MvToAlternateWindow', tmux.mv_to_alternate_window, {}, ta)
+t.create_cmd('L42MvToWindowLeft', tmux.mv_to_window_left, {}, tl )
+t.create_cmd('L42MvToWindowRight', tmux.mv_to_window_right, {}, tr)
+t.create_cmd('L42MvToAlternateWindowAndAgain', tmux.mv_to_alternate_window_and_again, {}, taa)
+t.create_cmd('L42MvToWindowLeftAndAgain', tmux.mv_to_window_left_and_again, {}, tla )
+t.create_cmd('L42MvToWindowRightAndAgain', tmux.mv_to_window_right_and_again, {}, tra)
 
-t.create_command('L42TmuxTest', tmux.test_command, {}, tt)
+t.create_cmd('L42TmuxTest', tmux.test_command, {}, tt)
 
-t.create_command('L42TmuxVimVersion', tmux.version, {}, '<Leader>vers')
+t.create_cmd('L42TmuxVimVersion', tmux.version, {}, '<Leader>vers')
