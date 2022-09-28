@@ -41,3 +41,4 @@ describe("movement functions", function()
     assert.are.same({"system", {"tmux select-window -t :=" .. value}}, vim.api._called()[2])
   end)
 end)
+--SPDX-License-Identifier: Apache-2.0

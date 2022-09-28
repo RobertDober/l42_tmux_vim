@@ -3,9 +3,9 @@
 
 local api = vim.api
 
-local function p(value)
-  print(vim.inspect(value))
-end
+-- local function p(value)
+--   print(vim.inspect(value))
+-- end
 
 local function create_cmd(cmd_name, cmd_value, cmd_options, mapping)
   local cmd_options = cmd_options or {}
@@ -42,7 +42,7 @@ local function get_var_or(name, handler)
     if type(handler) == 'function' then
       return handler(name)
     elseif type(handler) == 'string' then
-      error("attempt to read undefined variable: g:" .. name .. "; " .. string)
+      error("attempt to read undefined variable: g:" .. name .. "; " .. handler)
     else
       error("attempt to read undefined variable: g:" .. name)
     end
@@ -64,6 +64,6 @@ return {
   get_var = get_var,
   get_var_or = get_var_or,
   init_var = init_var,
-  p = p,
+  -- p = p,
   system_cmd = system_cmd,
 }

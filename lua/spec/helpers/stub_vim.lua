@@ -1,7 +1,7 @@
 -- local dbg = require("debugger")
 -- dbg.auto_where = 2
 local lst = require 'l42.tools.list'
-local split = require'l42.tools.string'.split
+local split = require'spec.helpers.string'.split
 
 local _buffer = {
   cursor = {1, 0},

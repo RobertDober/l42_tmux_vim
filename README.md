@@ -178,3 +178,10 @@ local function my_cmd()
     }
 end
 ```
+
+## LICENSE
+
+Copyright 2022 Robert Dober robert.dober@gmail.com
+
+Apache-2.0 [c.f LICENSE](LICENSE)
+<!-- SPDX-License-Identifier: Apache-2.0 -->

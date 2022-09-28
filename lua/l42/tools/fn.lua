@@ -72,7 +72,7 @@ local function foldl(list, fn, initial)
   if not acc then
     if #list == 0 then error("must not fold an empty list without an initial value") end
     init_idx = 2
-    acc = list[1]
+    acc = _access(list, 1)
   end
   local size = #list
   for idx = init_idx, size do
