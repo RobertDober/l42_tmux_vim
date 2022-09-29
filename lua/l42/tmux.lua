@@ -43,6 +43,38 @@ local function mv_to_window_right_and_again()
   c.select_window('+1')
 end
 
+local function _mix_test_command(ctxt)
+  local cmd = t.get_var('l42_tmux_elixir_test_command')
+  local dest = t.get_var('l42_tmux_elixir_test_window')
+  local line = ctxt.file_path .. ":" .. ctxt.lnb
+
+  cc{
+    {
+      match = "^%s*describe%s",
+      cmd = cmd,
+      dest = dest,
+      params = line
+    },
+    {
+      match = "^%s*test%s",
+      cmd = cmd,
+      dest = dest,
+      params = line
+    },
+    {
+      cmd = cmd,
+      dest = dest,
+      match = "^%s*$",
+    },
+    {
+      match = ".*",
+      cmd = cmd,
+      dest = dest,
+      params = ctxt.file_path
+    }
+  }
+end
+
 local function _rspec_test_command(ctxt)
   local cmd = t.get_var('l42_tmux_ruby_test_command')
   local dest = t.get_var('l42_tmux_ruby_test_window')
@@ -79,15 +111,15 @@ local function _rspec_test_command(ctxt)
       params = ctxt.file_path
     }
   }
-
-  if context_command then
-  end
-
 end
+
 local function test_command()
   local ctxt = ctxt()
   if string.match(ctxt.file_name, "_spec%.rb$") then
     return _rspec_test_command(ctxt)
+  end
+  if string.match(ctxt.file_name, "_test%.exs$") then
+    return _mix_test_command(ctxt)
   end
 end
 

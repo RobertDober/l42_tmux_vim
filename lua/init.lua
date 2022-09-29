@@ -16,6 +16,8 @@ local tra = t.init_var('l42_tmux_mv_to_window_right_again', '<Leader>tr')
 local tt  = t.init_var('l42_tmux_test_command', '<Leader>tt')
 t.init_var('l42_tmux_ruby_test_command', 'bundle exec rspec')
 t.init_var('l42_tmux_ruby_test_window', 'tests')
+t.init_var('l42_tmux_elixir_test_command', 'mix test')
+t.init_var('l42_tmux_elixir_test_window', 'tests')
 
 
 t.create_cmd('L42MvToAlternateWindow', tmux.mv_to_alternate_window, {}, ta)
